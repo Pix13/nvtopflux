@@ -1,0 +1,30 @@
+[
+  {
+    "device_name": "AMD BC-250",
+    "gpu_clock": "1000MHz",
+    "mem_clock": "450MHz",
+    "temp": "36C",
+    "fan_speed": "CPU Fan",
+    "power_draw": "40W",
+    "gpu_util": null,
+    "encode": null,
+    "decode": null,
+    "mem_util": "0%",
+    "mem_total": "17716740096",
+    "mem_used": "18620416",
+    "mem_free": "17698119680",
+    "processes": [
+      {
+        "pid": "229655",
+        "cmdline": "nvtop -s",
+        "kind": "graphic",
+        "user": "dev",
+        "gpu_usage": null,
+        "gpu_mem_bytes_alloc": "12288",
+        "gpu_mem_usage": "0%",
+        "encode": null,
+        "decode": null
+      }
+    ]
+  }
+]

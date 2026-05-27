@@ -49,6 +49,7 @@ The exporter must ingest every emitted JSON object and write metrics to InfluxDB
 
 The implementation agent must:
 
+0. Always use the uv tool to create Python venv
 1. Create a Python exporter.
 2. Read `nvtop` JSON data continuously from either:
    - `stdin`, for piping from `nvtop`, or

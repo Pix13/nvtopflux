@@ -1,0 +1,24 @@
+[Unit]
+Description=nvtop InfluxDB Exporter
+Documentation=https://github.com/username/nvtopflux
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/nvtopflux
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nvtopflux
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/log/nvtopflux
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
