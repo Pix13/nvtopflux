@@ -94,7 +94,7 @@ The exporter spawns `nvtop` automatically:
 ### Stdin mode (pipe from nvtop)
 
 ```bash
-nvtop -s | .venv/bin/python src/nvtop_influx_exporter.py --stdin --config config/exporter.yaml
+nvtop -s -l | .venv/bin/python src/nvtop_influx_exporter.py --stdin --config config/exporter.yaml
 ```
 
 ### One-shot mode
