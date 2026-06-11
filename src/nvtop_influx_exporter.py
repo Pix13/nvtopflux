@@ -144,11 +144,12 @@ def normalize_process_fields(process: dict) -> dict:
     return fields
 
 
-def build_gpu_point(gpu: dict, host: Optional[str], timestamp) -> Point:
+def build_gpu_point(gpu: dict, gpu_index: int, host: Optional[str], timestamp) -> Point:
     """Build one gpu_stats point."""
     point = Point("gpu_stats").time(timestamp, "ns")
     if gpu.get("device_name"):
         point.tag("device_name", gpu["device_name"])
+    point.tag("gpu_index", str(gpu_index))
     if host:
         point.tag("host", host)
 
@@ -158,7 +159,7 @@ def build_gpu_point(gpu: dict, host: Optional[str], timestamp) -> Point:
     return point
 
 
-def build_process_points(gpu: dict, host: Optional[str], timestamp) -> list:
+def build_process_points(gpu: dict, gpu_index: int, host: Optional[str], timestamp) -> list:
     """Build gpu_process_stats points for all processes attached to a GPU."""
     points = []
     processes = gpu.get("processes")
@@ -169,6 +170,7 @@ def build_process_points(gpu: dict, host: Optional[str], timestamp) -> list:
     for proc in processes:
         point = Point("gpu_process_stats").time(timestamp, "ns")
         point.tag("device_name", device_name)
+        point.tag("gpu_index", str(gpu_index))
         if host:
             point.tag("host", host)
         if proc.get("pid"):
@@ -317,9 +319,9 @@ def run_exporter(config: dict, use_stdin: bool = False, once: bool = False, dry_
             gpu_points = []
             process_points = []
 
-            for gpu in batch:
-                gpu_points.append(build_gpu_point(gpu, hostname, timestamp))
-                process_points.extend(build_process_points(gpu, hostname, timestamp))
+            for gpu_index, gpu in enumerate(batch):
+                gpu_points.append(build_gpu_point(gpu, gpu_index, hostname, timestamp))
+                process_points.extend(build_process_points(gpu, gpu_index, hostname, timestamp))
 
             all_points = gpu_points + process_points
 
