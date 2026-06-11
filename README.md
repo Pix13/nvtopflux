@@ -117,13 +117,24 @@ Parse and print normalized Line Protocol points without writing to InfluxDB:
 cat sample-nvtop.json | .venv/bin/python src/nvtop_influx_exporter.py --stdin --once --dry-run --config etc/config.cfg
 ```
 
-Example output:
+Example output (single GPU):
 
 ```
-gpu_stats,device_name=AMD\ BC-250,host=myhost gpu_clock_mhz=1000,mem_clock_mhz=450,temp_celsius=36,power_draw_watts=40,mem_util_percent=0,mem_total_bytes=17716740096i,mem_used_bytes=18620416i,mem_free_bytes=17698119680i
+gpu_stats,device_name=AMD\ BC-250,gpu_index=0,host=myhost gpu_clock_mhz=1000,mem_clock_mhz=450,temp_celsius=36,power_draw_watts=40,mem_util_percent=0,mem_total_bytes=17716740096i,mem_used_bytes=18620416i,mem_free_bytes=17698119680i
 
-gpu_process_stats,device_name=AMD\ BC-250,host=myhost,pid=229655,user=dev,kind=graphic cmdline="nvtop -s",gpu_mem_bytes_alloc=12288i,gpu_mem_usage_percent=0
+gpu_process_stats,device_name=AMD\ BC-250,gpu_index=0,host=myhost,pid=229655,user=dev,kind=graphic cmdline="nvtop -s",gpu_mem_bytes_alloc=12288i,gpu_mem_usage_percent=0
 ```
+
+On a **multi-GPU system**, each GPU gets a unique `gpu_index` tag:
+
+```
+gpu_stats,device_name=NVIDIA\ GeForce\ RTX\ 3090,gpu_index=0,host=behemoth temp_celsius=70,power_draw_watts=202,...
+gpu_stats,device_name=NVIDIA\ GeForce\ RTX\ 3090,gpu_index=1,host=behemoth temp_celsius=66,power_draw_watts=216,...
+gpu_process_stats,device_name=NVIDIA\ GeForce\ RTX\ 3090,gpu_index=0,host=behemoth,pid=68642,user=root,kind=compute cmdline="VLLM::Worker_TP0",...
+gpu_process_stats,device_name=NVIDIA\ GeForce\ RTX\ 3090,gpu_index=1,host=behemoth,pid=68679,user=root,kind=compute cmdline="VLLM::Worker_TP1",...
+```
+
+This allows you to distinguish GPUs with identical `device_name` values in Grafana queries.
 
 ## Systemd Service (Recommended for Production)
 
@@ -180,7 +191,9 @@ ExecStart=/path/to/nvtopflux/.venv/bin/python /usr/local/bin/nvtopflux
 
 GPU-level metrics, one point per GPU per iteration.
 
-**Tags:** `device_name`, `host`
+**Tags:** `device_name`, `gpu_index`, `host`
+
+The `gpu_index` tag (0, 1, 2, ...) uniquely identifies each GPU, which is essential on multi-GPU systems where multiple GPUs share the same `device_name` (e.g., two NVIDIA GeForce RTX 3090 cards).
 
 **Fields:**
 
@@ -203,7 +216,7 @@ GPU-level metrics, one point per GPU per iteration.
 
 Per-process GPU metrics, one point per process per iteration.
 
-**Tags:** `device_name`, `host`, `pid`, `user`, `kind`
+**Tags:** `device_name`, `gpu_index`, `host`, `pid`, `user`, `kind`
 
 **Fields:**
 
@@ -339,5 +352,4 @@ The exporter logs the error and continues. Check logs for details:
 
 - The exporter runs on the host (not in Docker) to access `nvtop` and the local GPU stack.
 - `nvtop` JSON output format may vary between versions; the exporter handles known formats but may need updates for new fields.
-- Multi-GPU systems are supported; each GPU produces its own data points.
 - `cmdline` is stored as a field (not a tag) to avoid high cardinality issues.
