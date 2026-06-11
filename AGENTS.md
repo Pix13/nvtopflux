@@ -76,8 +76,8 @@ The final repository should follow this structure:
 ├── .env.example
 ├── src/
 │   └── nvtop_influx_exporter.py
-├── config/
-│   └── exporter.example.yaml
+├── etc/
+│   └── config.example.cfg
 └── grafana/
     └── provisioning/
         ├── datasources/
@@ -104,20 +104,18 @@ python-dotenv
 The exporter must be able to run with:
 
 ```bash
-python3 src/nvtop_influx_exporter.py --config config/exporter.yaml
+python3 src/nvtop_influx_exporter.py --config etc/config.cfg
 ```
 
 It must also support piping:
 
 ```bash
-nvtop -s | python3 src/nvtop_influx_exporter.py --stdin --config config/exporter.yaml
+nvtop -s -l | python3 src/nvtop_influx_exporter.py --stdin --config etc/config.cfg
 ```
-
-If the exact `nvtop` JSON loop command differs, make it configurable.
 
 ## Configuration file
 
-Create `config/exporter.example.yaml`:
+Create `etc/config.example.cfg`:
 
 ```yaml
 influxdb:
@@ -136,7 +134,7 @@ exporter:
   log_level: "INFO"
 ```
 
-Environment variables in the YAML file must be expanded.
+Environment variables in the YAML file must be expanded. Users must copy `etc/config.example.cfg` to `etc/config.cfg` and edit it.
 
 ## InfluxDB data model
 
@@ -510,7 +508,7 @@ The agent must add basic tests or at minimum a testable dry-run workflow.
 Recommended test command:
 
 ```bash
-cat sample-nvtop.json | python3 src/nvtop_influx_exporter.py --stdin --once --dry-run --config config/exporter.example.yaml
+cat sample-nvtop.json | python3 src/nvtop_influx_exporter.py --stdin --once --dry-run --config etc/config.example.cfg
 ```
 
 Expected dry-run output must show normalized points similar to:

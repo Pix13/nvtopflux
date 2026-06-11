@@ -64,7 +64,7 @@ curl http://localhost:8086/ping
 
 ```bash
 # Copy and edit the config
-cp config/exporter.example.yaml config/exporter.yaml
+cp etc/config.example.cfg etc/config.cfg
 ```
 
 Configuration options:
@@ -88,13 +88,17 @@ Environment variables in the YAML file are expanded automatically. Set `INFLUXDB
 The exporter spawns `nvtop` automatically:
 
 ```bash
-.venv/bin/python src/nvtop_influx_exporter.py --config config/exporter.yaml
+# First, create your config from the example
+cp etc/config.example.cfg etc/config.cfg
+# Edit etc/config.cfg with your InfluxDB credentials
+
+.venv/bin/python src/nvtop_influx_exporter.py --config etc/config.cfg
 ```
 
 ### Stdin mode (pipe from nvtop)
 
 ```bash
-nvtop -s -l | .venv/bin/python src/nvtop_influx_exporter.py --stdin --config config/exporter.yaml
+nvtop -s -l | .venv/bin/python src/nvtop_influx_exporter.py --stdin --config etc/config.cfg
 ```
 
 ### One-shot mode
@@ -102,7 +106,7 @@ nvtop -s -l | .venv/bin/python src/nvtop_influx_exporter.py --stdin --config con
 Read one JSON batch, export it, then exit:
 
 ```bash
-.venv/bin/python src/nvtop_influx_exporter.py --config config/exporter.yaml --once
+.venv/bin/python src/nvtop_influx_exporter.py --config etc/config.cfg --once
 ```
 
 ### Dry-run mode
@@ -110,7 +114,7 @@ Read one JSON batch, export it, then exit:
 Parse and print normalized Line Protocol points without writing to InfluxDB:
 
 ```bash
-cat sample-nvtop.json | .venv/bin/python src/nvtop_influx_exporter.py --stdin --once --dry-run --config config/exporter.yaml
+cat sample-nvtop.json | .venv/bin/python src/nvtop_influx_exporter.py --stdin --once --dry-run --config etc/config.cfg
 ```
 
 Example output:
@@ -128,7 +132,7 @@ Install as a systemd service for automatic startup and restart:
 ```bash
 # 1. Create config directory and install config
 sudo mkdir -p /etc/nvtopflux
-sudo cp etc/config.cfg /etc/nvtopflux/config.cfg
+sudo cp etc/config.example.cfg /etc/nvtopflux/config.cfg
 
 # 2. Edit the config with your InfluxDB credentials
 sudo editor /etc/nvtopflux/config.cfg
@@ -321,7 +325,7 @@ The token may not have been expanded in the provisioning file. Enter it manually
 
 The exporter logs the error and continues. Check logs for details:
 ```bash
-.venv/bin/python src/nvtop_influx_exporter.py --config config/exporter.yaml --log-level DEBUG
+.venv/bin/python src/nvtop_influx_exporter.py --config etc/config.cfg --log-level DEBUG
 ```
 
 ## Security Notes
