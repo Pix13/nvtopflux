@@ -20,4 +20,4 @@ ProtectHome=read-only
 PrivateTmp=true
 
 [Install]
-WantedBy=multi-top.target
+WantedBy=multi-user.target
