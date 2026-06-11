@@ -17,8 +17,7 @@ SyslogIdentifier=nvtopflux
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/var/log/nvtopflux
 PrivateTmp=true
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-top.target
