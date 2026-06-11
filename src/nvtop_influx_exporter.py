@@ -12,7 +12,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timezone
-from typing import Iterator
+from typing import Iterator, Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -35,7 +35,7 @@ def load_config(path: str) -> dict:
     return yaml.safe_load(raw)
 
 
-def parse_numeric(value, suffix: str | None = None, as_int: bool = False):
+def parse_numeric(value, suffix: Optional[str] = None, as_int: bool = False):
     """Parse nvtop numeric strings such as 1000MHz, 36C, 40W, 0%, or byte strings."""
     if value is None:
         return None
@@ -144,7 +144,7 @@ def normalize_process_fields(process: dict) -> dict:
     return fields
 
 
-def build_gpu_point(gpu: dict, host: str | None, timestamp) -> Point:
+def build_gpu_point(gpu: dict, host: Optional[str], timestamp) -> Point:
     """Build one gpu_stats point."""
     point = Point("gpu_stats").time(timestamp, "ns")
     if gpu.get("device_name"):
@@ -158,7 +158,7 @@ def build_gpu_point(gpu: dict, host: str | None, timestamp) -> Point:
     return point
 
 
-def build_process_points(gpu: dict, host: str | None, timestamp) -> list:
+def build_process_points(gpu: dict, host: Optional[str], timestamp) -> list:
     """Build gpu_process_stats points for all processes attached to a GPU."""
     points = []
     processes = gpu.get("processes")
